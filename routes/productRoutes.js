@@ -1,18 +1,28 @@
-const express = require('express')
-
-const productController = require("../controllers/productController");
+const express = require('express');
+const path = require('path');
+const productController = require('../controllers/productController');
 
 const router = express.Router();
 
-router.post('/add-product/:firmId',productController.addProduct);
-router.get('/:firmId/products' , productController.getProductByFirm)
+// Add product
+router.post('/add-product/:firmId', productController.addProduct);
 
-router.get("/uploads/:imageName",(req,res)=>{
-    const imageName = req.params.imageName;
-    res.headersSent('Content-Type','image/jpeg');
-    res.sendFile(Path2D.join(__dirname , '..' , 'uploads',imageName))
+// Get all products for a firm
+router.get('/:firmId/products', productController.getProductByFirm);
+
+// Serve uploaded images
+router.get('/uploads/:imageName', (req, res) => {
+  const imageName = req.params.imageName;
+  const imagePath = path.join(__dirname, '..', 'uploads', imageName);
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(imagePath, (err) => {
+    if (err) {
+      res.status(404).json({ message: 'Image not found' });
+    }
+  });
 });
 
-router.delete('/:productId'.productController.deleteProductById)
+// Delete a product by ID
+router.delete('/:productId', productController.deleteProductById);
 
 module.exports = router;
